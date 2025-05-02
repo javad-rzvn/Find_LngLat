@@ -1,28 +1,23 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="fa" dir="rtl">
+
 <head>
   <meta charset="utf-8" />
-  <title>Find LngLat + 地区踏査モード (GPX altitude/time fix)</title>
+  <title>جستجو محل و یافتن طول و عرض جغرافیایی و اطلاعات آب و هوا</title>
   <!-- MapLibre GL CSS -->
-  <link
-    href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css"
-    rel="stylesheet"
-  />
+  <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"
+    type="text/css" />
   <!-- Font Awesome（現在地アイコンなど） -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    integrity="sha512-fa8dsp+MxFf43utQyWbr0v4qEAz1zHUGaNJ8M0bDzfrBms9D8h/xVEqdnt2bl6v0kOk9FSOcTpDu7AJ6bHguag=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: sans-serif;
+      font-family: Vazirmatn, sans-serif !important;
       position: relative;
     }
+
     /* ===== 説明文 ===== */
     details summary {
       cursor: pointer;
@@ -30,6 +25,7 @@
       font-size: 1.1rem;
       margin-bottom: 5px;
     }
+
     #info-details {
       padding: 5px 10px;
       background-color: #f8f8f8;
@@ -44,6 +40,7 @@
       margin: 10px;
       gap: 10px;
     }
+
     .control-group {
       background-color: rgba(255, 255, 255, 0.8);
       border: 1px solid #ccc;
@@ -53,12 +50,15 @@
       align-items: center;
       gap: 5px;
     }
+
     #search-input {
       width: 200px;
       height: 30px;
       font-size: 16px;
       padding: 5px;
+      font-family: inherit;
     }
+
     #search-button,
     #tansa-start-button,
     #register-button,
@@ -67,7 +67,9 @@
       font-size: 14px;
       padding: 5px 12px;
       cursor: pointer;
+      font-family: inherit;
     }
+
     #style-select {
       height: 34px;
       font-size: 14px;
@@ -79,7 +81,8 @@
       width: 100%;
       height: 65vh;
       position: relative;
-      background-color: #eee; /* fallback */
+      background-color: #eee;
+      /* fallback */
     }
 
     /* 現在地ボタン (左下) */
@@ -101,11 +104,13 @@
       cursor: pointer;
       transition: all 0.3s;
     }
+
     #get-location-button.active {
       background-color: #87CEFA;
       color: #fff;
       border: none;
     }
+
     .custom-popup {
       background-color: white;
       border: 1px solid black;
@@ -113,8 +118,13 @@
       font-size: 14px;
       cursor: pointer;
       transition: opacity 0.8s ease;
+      font-family: Vazirmatn, sans-serif;
     }
-    .fade-out { opacity: 0 !important; }
+
+    .fade-out {
+      opacity: 0 !important;
+    }
+
     .copy-toast {
       position: fixed;
       top: 10%;
@@ -129,22 +139,25 @@
       transition: opacity 0.5s, transform 0.5s;
       z-index: 9999;
     }
+
     .copy-toast.visible {
       opacity: 1;
       transform: translate(-50%, 0);
     }
+
     #export-modal {
       position: fixed;
-      top: 0; 
-      left: 0; 
-      right: 0; 
+      top: 0;
+      left: 0;
+      right: 0;
       bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      display: none; 
-      align-items: center; 
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
       justify-content: center;
       z-index: 99999;
     }
+
     #export-modal-content {
       background: #fff;
       padding: 20px;
@@ -152,99 +165,134 @@
       max-width: 300px;
       text-align: center;
     }
+
     #export-modal-buttons {
       margin-top: 15px;
-      display: flex; 
+      display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
     }
+
     #export-modal-buttons button {
-      font-size: 18px; 
-      padding: 8px 16px; 
-      cursor: pointer;
-    }
-    #tag-modal {
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      right: 0; 
-      bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      display: none; 
-      align-items: center; 
-      justify-content: center;
-      z-index: 99999;
-    }
-    #tag-modal-content {
-      background: #fff; 
-      padding: 20px; 
-      border-radius: 8px; 
-      max-width: 400px;
-      text-align: center;
-    }
-    #tag-list {
-      display: flex; 
-      flex-direction: column; 
-      align-items: flex-start;
-      margin-top: 10px; 
-      gap: 10px;
-    }
-    #tag-list button {
-      font-size: 18px; 
+      font-size: 18px;
       padding: 8px 16px;
       cursor: pointer;
     }
+
+    #tag-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    #tag-modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    #tag-list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    #tag-list button {
+      font-size: 18px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
     #tag-cancel {
-      font-size: 18px; 
-      padding: 8px 16px; 
+      font-size: 18px;
+      padding: 8px 16px;
       margin-top: 10px;
       cursor: pointer;
     }
+
+    .weatherData ul {
+      text-align: right;
+    }
+
+    .weatherData ul li {
+      list-style: none;
+      padding: 5px 0;
+    }
+
+    .copyLatLon {
+      font-size: 11px;
+      background: black;
+      color: #fff;
+      border-radius: 4px;
+      padding: 3px 6px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .currentTime {
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .swal2-confirm {
+      font-family: Vazirmatn, sans-serif !important;
+    }
   </style>
 </head>
+
 <body>
   <!-- 説明文 -->
   <details id="info-details" open>
-    <summary>Find LngLat</summary>
+    <summary>جستجو محل و یافتن طول و عرض جغرافیایی و اطلاعات آب و هوا</summary>
     <p>
-      このページでは任意地点の緯度経度をコピペできます<br />
-      使い方：検索ボックスで検索するか、地図を動かして緯度経度を取得したい地点を
-      <strong>クリック</strong>してください。その後、CSVなどに貼りつけてご利用ください<br />
-      地区踏査モードを利用すると移動の軌跡や地点にコメントを登録できます。結果はGPXとして出力しQGISでも利用できます。<br />
-      利用地図：OpenStreetMap(©OpenStreetMap Contributors),
-      <a href="https://github.com/armd-02/Playgrounds/tree/main/tiles" target="_blank" rel="noopener">osmfj_poi.json(K-Sakanoshita)</a>,
-      全国最新写真(<a href="https://maps.gsi.go.jp/development/ichiran.html#seamlessphoto" target="_blank" rel="noopener">地理院タイル</a>)<br />
-      利用API：OpenStreetMap Nominatim APIを利用しています。<br />
-      作成者：
-      <a href="https://x.com/GISPHN" target="_blank" rel="noopener">@GISPHN</a>
+      در این صفحه می‌توانید مختصات طول و عرض جغرافیایی هر نقطه دلخواه را کپی و پیست کنید.<br />
+      نحوه استفاده: با استفاده از جعبه جستجو مکان مورد نظر را جستجو کرده یا نقشه را جابجا کنید و سپس روی نقطه‌ای که
+      می‌خواهید مختصات آن را بگیرید <strong>کلیک</strong> نمایید. سپس می‌توانید مختصات را در فایل‌هایی مانند CSV
+      بچسبانید و استفاده کنید.<br />
+      نقشه‌های مورد استفاده: OpenStreetMap (© مشارکت‌کنندگان OpenStreetMap)،
+      API مورد استفاده: از OpenStreetMap Nominatim API استفاده شده است.<br />
+      سازنده: <a href="https://x.com/GISPHN" target="_blank" rel="noopener">@GISPHN</a> |
+      اصلاح شده توسط: <a href="https://x.com/javad_rzvn" target="_blank" rel="noopener">@javad_rzvn</a>
     </p>
+
   </details>
 
   <!-- 操作パネル -->
   <div id="controls-container">
     <!-- 検索ボックス -->
     <div class="control-group">
-      <input type="text" id="search-input" placeholder="施設名や住所..." />
-      <button id="search-button">検索</button>
+      <input type="text" id="search-input" placeholder="نام محل یا آدرس موردنظر را وارد کنید ..." />
+      <button id="search-button">جستجو</button>
     </div>
 
     <!-- スタイル切り替え -->
     <div class="control-group">
-      <label for="style-select">地図スタイル：</label>
+      <label for="style-select">استایل نقشه:</label>
       <select id="style-select">
-        <option value="https://tile.openstreetmap.jp/styles/osm-bright/style.json">OSM Bright</option>
-        <option value="https://raw.githubusercontent.com/armd-02/Playgrounds/main/tiles/osmfj_poi.json">OSMFJ POI</option>
-        <option value="https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg">全国最新写真</option>
+        <option value="https://tile.openstreetmap.com/styles/osm-bright/style.json">OSM Bright</option>
+        <!-- <option value="https://raw.githubusercontent.com/armd-02/Playgrounds/main/tiles/osmfj_poi.json">OSMFJ POI</option> -->
+        <!-- <option value="https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg">全国最新写真</option> -->
       </select>
     </div>
 
     <!-- 地区踏査モードボタン群 -->
-    <div class="control-group">
+    <!-- <div class="control-group">
       <button id="tansa-start-button">地区踏査モード開始</button>
       <button id="register-button">登録</button>
       <button id="stop-button">終了</button>
-    </div>
+    </div> -->
   </div>
 
   <!-- 地図表示領域 -->
@@ -256,7 +304,7 @@
   </div>
 
   <!-- 出力モーダル (GPX/KML) -->
-  <div id="export-modal">
+  <!-- <div id="export-modal">
     <div id="export-modal-content">
       <p>記録を終了しました。ファイルをダウンロードしますか？</p>
       <div id="export-modal-buttons">
@@ -265,12 +313,12 @@
         <button id="export-close">閉じる</button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- タグ選択モーダル -->
-  <div id="tag-modal">
+  <!-- <div id="tag-modal">
     <div id="tag-modal-content">
-      <p>タグを選択してください（1つだけ）。<br/>スキップも可能です。</p>
+      <p>タグを選択してください（1つだけ）。<br />スキップも可能です。</p>
       <div id="tag-list">
         <button data-tag="行政と政治">1.行政と政治</button>
         <button data-tag="人口統計">2.人口統計</button>
@@ -284,7 +332,9 @@
       </div>
       <button id="tag-cancel">スキップ</button>
     </div>
-  </div>
+  </div> -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- MapLibre JS -->
   <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
@@ -322,14 +372,14 @@
       paint: {
         'line-color': '#0000ff',
         'line-width': 3,
-        'line-dasharray': [2,2]
+        'line-dasharray': [2, 2]
       }
     };
 
     const map = new maplibregl.Map({
       container: 'map',
       style: 'https://tile.openstreetmap.jp/styles/osm-bright/style.json',
-      center: [135.5022, 34.6937],
+      center: [51.389477, 35.689184],
       zoom: 13
     });
 
@@ -362,7 +412,7 @@
           sources: {
             'gsi-photo': {
               type: 'raster',
-              tiles: [ val ],
+              tiles: [val],
               tileSize: 256
             }
           },
@@ -402,11 +452,11 @@
           return;
         }
         const { lat, lon, display_name } = data[0];
-        map.setCenter([ +lon, +lat ]);
+        map.setCenter([+lon, +lat]);
         map.setZoom(16);
 
         new maplibregl.Popup({ closeOnClick: true })
-          .setLngLat([ +lon, +lat ])
+          .setLngLat([+lon, +lat])
           .setHTML(`<div class="custom-popup">${display_name}</div>`)
           .addTo(map);
 
@@ -427,10 +477,11 @@
       document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
 
       const popup = new maplibregl.Popup({ closeOnClick: false })
-        .setLngLat([ lng, lat ])
+        .setLngLat([lng, lat])
         .setHTML(`
           <div class="custom-popup">
-            Lat: ${lat}, Lng: ${lng}<br>(クリックでコピー)
+            Lat: ${lat}, Lng: ${lng}<br>
+            (برای دریافت مختصات و نمایش آب و هوا کلیک کنید)
           </div>
         `)
         .addTo(map);
@@ -438,15 +489,44 @@
       // 再クリックでクリップボードコピー
       setTimeout(() => {
         const content = popup.getElement().querySelector('.custom-popup');
+        // Construct the API URL with the extracted coordinates
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,precipitation,rain,relative_humidity_2m&forecast_days=1`;
+
         if (!content) return;
         content.addEventListener('click', async () => {
           try {
-            await navigator.clipboard.writeText(`${lat}, ${lng}`);
-            showToast("クリップボードにコピーしました！");
-            content.classList.add('fade-out');
-            setTimeout(() => popup.remove(), 800);
+            showAlert("درحال دریافت اطلاعات آب و هوا ...", "question");
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("خطا در دریافت اطلاعات آب و هوا");
+            const data = await response.json();
+            // Extract temperature and precipitation values
+            const _current_time = data.current.time;
+            const _temperature = data.current.temperature_2m;
+            const _precipitation = data.current.precipitation;
+            const _rain = data.current.rain;
+            const _relative_humidity_2m = data.current.relative_humidity_2m;
+
+            const toastMessage = '<div class="weatherData"><ul>' +
+              '<li>مختصات جغرافیایی: <br> طول: ' + lng + ' عرض: ' + lat + '<a class="copyLatLon">کپی مختصات</a></li>' +
+              '<li>زمان: ' + '<span class="currentTime" data-lat="' + lat + '" data-lon="' + lng + '">' + _current_time + '</span></li>' +
+              '<li>دما: ' + _temperature + ' درجه سلسیوس</li>' +
+              '<li>بارش: ' + _precipitation + ' میلی متر</li>' +
+              '<li>باران: ' + _rain + ' میلی متر</li>' +
+              '<li>رطوبت: ' + _relative_humidity_2m + ' درصد</li>' +
+              '</ul></div>';
+            showAlert(toastMessage, "success");
+            // content.classList.add('fade-out');
+            // setTimeout(() => popup.remove(), 800);
+
+            const copyLatLon = document.querySelector('.copyLatLon');
+            copyLatLon.addEventListener("click", async () => {
+              // $(this).attr("data-id")
+              await navigator.clipboard.writeText(`${lat}, ${lng}`);
+              showToast("مختصات محل ذخیره شد!")
+            });
+
           } catch (err) {
-            alert("コピーに失敗: " + err);
+            alert("خطا در کپی: " + err);
           }
         });
       }, 100);
@@ -467,12 +547,12 @@
         (pos) => {
           locBtn.classList.remove('active');
           const { latitude, longitude } = pos.coords;
-          map.setCenter([ longitude, latitude ]);
+          map.setCenter([longitude, latitude]);
           map.setZoom(16);
 
           if (currentMarker) currentMarker.remove();
           currentMarker = new maplibregl.Marker({ color: "blue" })
-            .setLngLat([ longitude, latitude ])
+            .setLngLat([longitude, latitude])
             .addTo(map);
         },
         (err) => {
@@ -494,7 +574,7 @@
     let waypoints = [];
 
     function addSolidLinePoint(lng, lat) {
-      solidLineSource.data.geometry.coordinates.push([ lng, lat ]);
+      solidLineSource.data.geometry.coordinates.push([lng, lat]);
       if (map.getSource('solid-line-source')) {
         map.getSource('solid-line-source').setData(solidLineSource.data);
       }
@@ -504,7 +584,7 @@
         type: 'Feature',
         geometry: {
           type: 'LineString',
-          coordinates: [[prevLng, prevLat],[lng, lat]]
+          coordinates: [[prevLng, prevLat], [lng, lat]]
         }
       });
       if (map.getSource('dotted-line-source')) {
@@ -617,7 +697,7 @@
           });
 
           new maplibregl.Marker({ color: "red" })
-            .setLngLat([ lng, lat ])
+            .setLngLat([lng, lat])
             .setPopup(new maplibregl.Popup().setHTML(`
               ${c1 ? "Comment1: " + c1 + "<br>" : ""}
               ${c2 ? "Comment2: " + c2 + "<br>" : ""}
@@ -702,11 +782,11 @@
     function getNowYMDHMS() {
       const now = new Date();
       const yyyy = now.getFullYear();
-      const MM = String(now.getMonth()+1).padStart(2,'0');
-      const dd = String(now.getDate()).padStart(2,'0');
-      const hh = String(now.getHours()).padStart(2,'0');
-      const mm = String(now.getMinutes()).padStart(2,'0');
-      const ss = String(now.getSeconds()).padStart(2,'0');
+      const MM = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
       return `${yyyy}${MM}${dd}${hh}${mm}${ss}`;
     }
 
@@ -849,13 +929,23 @@
     /* ----------------------------------------------------------------
        12) トースト表示 (コピー完了など)
     ---------------------------------------------------------------- */
+    function showAlert(msg, icon) {
+      Swal.fire({
+        icon: icon,
+        html: `${msg}`,
+        showCloseButton: true,
+        confirmButtonColor: '#023e8a',
+        confirmButtonText: 'بستن پنجره'
+      })
+    }
+
     function showToast(msg) {
       const old = document.querySelector('.copy-toast');
       if (old) old.remove();
 
       const toast = document.createElement('div');
       toast.className = 'copy-toast';
-      toast.textContent = msg;
+      toast.innerHTML = msg;
       document.body.appendChild(toast);
 
       setTimeout(() => toast.classList.add('visible'), 10);
@@ -868,4 +958,5 @@
     }
   </script>
 </body>
+
 </html>
